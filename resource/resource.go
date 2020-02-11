@@ -3,6 +3,7 @@ package resource
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -255,4 +256,20 @@ func (r Resource) Fcontent(filename, defaultValue string) (string, error) {
 		return "", xerror.New(op, err)
 	}
 	return content, nil
+}
+
+// Load
+func (r Resource) Load(dir string) error {
+	const op string = "resource.Resource.Load"
+	rd, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, fi := range rd {
+		fileName := fi.Name()
+		fpath := fmt.Sprintf("%s/%s", dir, fileName)
+		file := file{fpath: fpath}
+		r.files[fileName] = file
+	}
+	return nil
 }
